@@ -1,0 +1,24 @@
+{
+  "name": "qobuz-dl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "chalk": "^4.1.0",
+    "flac-bindings": "^2.4.1",
+    "md5": "^2.2.1",
+    "node-fetch": "^2.6.0",
+    "progress": "^2.0.3",
+    "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.5.0"
+  }
+}
