@@ -4,7 +4,7 @@ const { api: flac } = require('flac-bindings');
 const axios = require('axios');
 const ProgressBar = require('progress');
 
-async function download (url, info) {
+async function download(url, info) {
 	await createFolder(null, true); //ensure download folder exists
 	const albumName = sanitizeFS(info.album.title);
 	const artistName = sanitizeFS(info.album.artist.name);
@@ -48,9 +48,12 @@ async function download (url, info) {
 	//
 }
 
-async function writeTags (filepath, info) {
-	const { album, composer, title, performer, performers, track_number } = info;
+async function writeTags(filepath, info) {
+	const { album, composer = {}, title, performer, performers, track_number } = info;
 	const { genres_list, artist, image, label, copyright, url, release_date_original } = album;
+	if (!composer) {
+		composer.name = 'Unknown';
+	}
 	const it = new flac.SimpleIterator();
 	it.init(filepath);
 	const vorbisComment = new flac.metadata.VorbisCommentMetadata();
