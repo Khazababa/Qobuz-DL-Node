@@ -4,8 +4,9 @@ const generateLink = require('./modules/generateLink');
 const { writeConfig, checkConfig } = require('./modules/config');
 const download = require('./modules/download');
 const prompt = require('prompt-sync')({ sigint: true });
+const parallelDownloadThreads = 4;
 
-init().catch(e => console.log(e));
+init().catch((e) => console.log(e));
 
 async function init() {
 	const config = await checkConfig();
@@ -23,18 +24,23 @@ async function init() {
 		const { appID, appSecret, token } = config;
 		const toDownload = prompt('Enter URL: ');
 		const downloadList = await generateLink(toDownload, appSecret, appID, token);
-		for (let track of downloadList) {
-			const fileInfo = await fetch(track.url, track.request).then(res => res.json());
-			const res = await download(fileInfo.url, track.info);
-			console.log(res);
+
+		let tasks = chunk(downloadList, parallelDownloadThreads);
+		for (let task of tasks) {
+			//synchronous loop to limit the number of downloads to the parallel tasks limit count
+			await Promise.all(task.map(singleDownload));
 		}
-		// await Promise.all(
-		// 	//testing
-		// 	downloadList.map(async track => {
-		// 		const fileInfo = await fetch(track.url, track.request).then(res => res.json());
-		// 		const res = await download(fileInfo.url, track.info);
-		// 		console.log(res);
-		// 	})
-		// );
 	}
+}
+function chunk(arr, size) {
+	const result = [];
+	for (let i = 0; i < arr.length; i += size) {
+		result.push(arr.slice(i, i + size));
+	}
+	return result;
+}
+
+async function singleDownload(track) {
+	const fileInfo = await fetch(track.url, track.request).then((res) => res.json());
+	await download(fileInfo.url, track.info);
 }
