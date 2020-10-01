@@ -30,6 +30,8 @@ async function init() {
 			//synchronous loop to limit the number of downloads to the parallel tasks limit count
 			await Promise.all(task.map(singleDownload));
 		}
+		console.log('\n');
+		init();
 	}
 }
 function chunk(arr, size) {
