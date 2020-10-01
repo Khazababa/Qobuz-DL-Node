@@ -1,51 +1,45 @@
 const fs = require('fs');
-const { createFolder, sanitizeFS } = require('./utility');
+const { createFolder } = require('./utility');
 const { api: flac } = require('flac-bindings');
 const axios = require('axios');
-const ProgressBar = require('progress');
+const { progressBar } = require('./utility');
+
+const sanitize = require('sanitize-filename');
 
 async function download(url, info) {
 	await createFolder(null, true); //ensure download folder exists
-	const albumName = sanitizeFS(info.album.title);
-	const artistName = sanitizeFS(info.album.artist.name);
-	const trackName = sanitizeFS(info.title);
+	const albumName = sanitize(info.album.title);
+	const artistName = sanitize(info.album.artist.name);
+	const trackName = sanitize(info.title);
 	await createFolder(artistName, false);
 	await createFolder(`${artistName}/${albumName}`, false);
 	// console.log(`Downloading ${artistName} ( ${albumName} ) - ${trackName}`);
 	const { data, headers } = await axios({
 		url,
 		method: 'GET',
-		responseType: 'stream'
+		responseType: 'stream',
 	});
 
 	const totalLength = headers['content-length'];
-	const green = '\u001b[42m \u001b[0m';
-	const progressBar = new ProgressBar(trackName + '.flac [:bar] :percent :etas [:rate mb/s]', {
+
+	const bar = progressBar.newBar(trackName + '.flac [:bar] :percent :etas [:rate mb/s]', {
 		width: 40,
-		complete: green,
+		complete: '=',
 		incomplete: ' ',
 		renderThrottle: 1,
-		total: parseInt(totalLength / 1000 / 1000 * 8)
+		total: parseInt((totalLength / 1000 / 1000) * 8),
 	});
 
-	await new Promise(resolve => {
+	await new Promise((resolve) => {
 		const writer = fs.createWriteStream(`./Downloads/${artistName}/${albumName}/${trackName}.flac`);
-		data.on('data', chunk => progressBar.tick(chunk.length / 1000 / 1000 * 8));
+		data.on('data', (chunk) => bar.tick((chunk.length / 1000 / 1000) * 8));
 		data.pipe(writer);
 		writer.on('finish', () => {
-			console.log('\n');
 			resolve();
 		});
 	});
 	await writeTags(`./Downloads/${artistName}/${albumName}/${trackName}.flac`, info);
 	return `Downloaded ${artistName}/${albumName}/${trackName}.flac`;
-	// await new Promise((resolve, reject) => {
-	// 	const fileStream = fs.createWriteStream(`./Downloads/${artistName}/${albumName}/${trackName}.flac`);
-	// 	res.body.pipe(fileStream);
-	// 	res.body.on('error', reject);
-	// 	fileStream.on('finish', resolve);
-	// });
-	//
 }
 
 async function writeTags(filepath, info) {
@@ -74,10 +68,13 @@ async function writeTags(filepath, info) {
 	const { data } = await axios({
 		url: image.large,
 		method: 'GET',
-		responseType: 'arraybuffer'
+		responseType: 'arraybuffer',
 	});
-	picture.data = data;
-	it.insertBlockAfter(vorbisComment);
-	it.insertBlockAfter(picture);
+	await new Promise((resolve) => {
+		picture.data = data;
+		it.insertBlockAfter(vorbisComment);
+		it.insertBlockAfter(picture);
+		resolve();
+	});
 }
 module.exports = download;
