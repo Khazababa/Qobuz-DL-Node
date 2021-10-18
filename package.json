@@ -10,7 +10,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"axios": "^0.20.0",
+		"axios": "^0.23.0",
 		"chalk": "^4.1.0",
 		"flac-bindings": "^2.5.0",
 		"md5": "^2.3.0",
