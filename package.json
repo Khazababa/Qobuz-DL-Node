@@ -21,6 +21,6 @@
 		"sanitize-filename": "^1.6.3"
 	},
 	"devDependencies": {
-		"eslint": "^7.10.0"
+		"eslint": "^8.4.0"
 	}
 }
