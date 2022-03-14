@@ -11,7 +11,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"axios": "^0.20.0",
-		"chalk": "^4.1.0",
+		"chalk": "^5.0.1",
 		"flac-bindings": "^2.5.0",
 		"md5": "^2.3.0",
 		"multi-progress": "^3.0.0",
