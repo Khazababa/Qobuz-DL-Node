@@ -15,7 +15,7 @@
 		"flac-bindings": "^2.5.0",
 		"md5": "^2.3.0",
 		"multi-progress": "^3.0.0",
-		"node-fetch": "^2.6.1",
+		"node-fetch": "^3.2.9",
 		"progress": "^2.0.0",
 		"prompt-sync": "^4.2.0",
 		"sanitize-filename": "^1.6.3"
